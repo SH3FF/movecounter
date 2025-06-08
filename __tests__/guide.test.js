@@ -6,7 +6,7 @@ describe('guide.html', () => {
   let document;
   beforeAll(() => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'guide.html'), 'utf8');
-    const dom = new JSDOM(html, { runScripts: 'dangerously' });
+    const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost' });
     document = dom.window.document;
   });
 
@@ -21,5 +21,18 @@ describe('guide.html', () => {
     const btn = document.getElementById('theme-toggle');
     btn.click();
     expect(document.body.classList.contains('dark')).toBe(true);
+  });
+
+  test('applies stored theme on load', () => {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'guide.html'), 'utf8');
+    const dom2 = new JSDOM(html, {
+      runScripts: 'dangerously',
+      url: 'http://localhost',
+      beforeParse(window) {
+        window.localStorage.setItem('theme', 'dark');
+      }
+    });
+    const doc2 = dom2.window.document;
+    expect(doc2.body.classList.contains('dark')).toBe(true);
   });
 });

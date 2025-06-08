@@ -6,7 +6,7 @@ describe('eateries.html', () => {
   let window, document;
   beforeAll(async () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'eateries.html'), 'utf8');
-    const dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable' });
+    const dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable', url: 'http://localhost' });
     await new Promise(r => dom.window.addEventListener('load', r));
     window = dom.window;
     document = window.document;
@@ -32,5 +32,19 @@ describe('eateries.html', () => {
   test('table rows contain no script elements', () => {
     const scripts = document.querySelectorAll('#eatery-table tbody script');
     expect(scripts.length).toBe(0);
+  });
+
+  test('applies stored theme on load', async () => {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'eateries.html'), 'utf8');
+    const dom2 = new JSDOM(html, {
+      runScripts: 'dangerously',
+      resources: 'usable',
+      url: 'http://localhost',
+      beforeParse(window) {
+        window.localStorage.setItem('theme', 'dark');
+      }
+    });
+    await new Promise(r => dom2.window.addEventListener('load', r));
+    expect(dom2.window.document.body.classList.contains('dark')).toBe(true);
   });
 });
