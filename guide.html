@@ -28,9 +28,14 @@
             left: 0;
             right: 0;
             background-color: var(--bg-color);
-            padding: 1rem 0;
-            text-align: center;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
             z-index: 1000;
+        }
+        nav {
+            flex: 1;
+            text-align: center;
         }
         nav a {
             margin: 0 0.5rem;
@@ -55,11 +60,11 @@
             <a href="guide.html">2025 Guide</a>
             <a href="eateries.html">Top Eateries</a>
         </nav>
+        <button id="theme-toggle">Dark Mode</button>
     </header>
     <main>
         <h1>2025 Guide to Chicago</h1>
         <p>Welcome to the Windy City! This brief guide will help you get settled in 2025 with tips on neighborhoods, transit, and things to see.</p>
-        <button id="theme-toggle">Dark Mode</button>
     </main>
 
     <script>
