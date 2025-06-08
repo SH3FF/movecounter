@@ -20,10 +20,17 @@
             color: var(--text-color);
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
-            padding: 1rem;
+            padding: 70px 1rem 1rem; /* top padding for fixed header */
         }
-        nav {
-            margin-bottom: 1rem;
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-color);
+            padding: 1rem 0;
+            text-align: center;
+            z-index: 1000;
         }
         nav a {
             margin: 0 0.5rem;
@@ -54,11 +61,14 @@
     </style>
 </head>
 <body>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="guide.html">2025 Guide</a>
-        <a href="eateries.html">Top Eateries</a>
-    </nav>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="guide.html">2025 Guide</a>
+            <a href="eateries.html">Top Eateries</a>
+        </nav>
+    </header>
+    <main>
     <h1>Top 100 Eateries in Downtown Chicago</h1>
 
     <div id="filters">
@@ -92,6 +102,7 @@
         </thead>
         <tbody></tbody>
     </table>
+    </main>
 
     <script>
         const cuisineSelect = document.getElementById('cuisine-filter');
@@ -138,7 +149,15 @@
                 if (holeFilter.checked && !e.hole) return;
                 if (takeoutFilter.checked && !e.takeout) return;
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${e.name}</td><td>${e.cuisine}</td><td>${e.price}</td>`;
+                const nameCell = document.createElement('td');
+                nameCell.textContent = e.name;
+                const cuisineCell = document.createElement('td');
+                cuisineCell.textContent = e.cuisine;
+                const priceCell = document.createElement('td');
+                priceCell.textContent = e.price;
+                row.appendChild(nameCell);
+                row.appendChild(cuisineCell);
+                row.appendChild(priceCell);
                 tableBody.appendChild(row);
             });
         }

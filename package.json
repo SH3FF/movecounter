@@ -1,0 +1,13 @@
+{
+  "name": "movecounter",
+  "version": "1.0.0",
+  "description": "Move Countdown site tests",
+  "type": "commonjs",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jsdom": "^22.1.0"
+  }
+}
