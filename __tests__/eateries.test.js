@@ -21,8 +21,8 @@ describe('eateries.html', () => {
     document = dom.window.document;
   });
 
-  test('header has title', () => {
-    const header = document.querySelector('header h1');
+  test('hero section has title', () => {
+    const header = document.querySelector('#hero h1');
     expect(header).not.toBeNull();
     expect(header.textContent).toContain('Chicago');
   });

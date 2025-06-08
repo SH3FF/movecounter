@@ -19,6 +19,13 @@
             --text-color: #f0f0f0;
             --accent-color: #ff8866;
         }
+        .dark .bg-white { background-color: #2a2a2a !important; }
+        .dark .text-gray-800 { color: #f0f0f0 !important; }
+        .dark .text-gray-700 { color: #e0e0e0 !important; }
+        .dark .text-gray-600 { color: #cccccc !important; }
+        .dark .border-gray-300 { border-color: #555555 !important; }
+        .dark .border-gray-200 { border-color: #444444 !important; }
+        .dark .bg-gray-200 { background-color: #444444 !important; color: #f0f0f0 !important; }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
@@ -137,18 +144,21 @@
 </head>
 <body class="antialiased">
 
+<header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="guide.html">2025 Guide</a>
+        <a href="eateries.html">Top Eateries</a>
+    </nav>
+    <button id="theme-toggle" class="ml-2">Dark Mode</button>
+</header>
+
 <div id="app" class="container mx-auto p-4 md:p-8">
-    <header class="text-center mb-10">
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="guide.html">2025 Guide</a>
-            <a href="eateries.html">Top Eateries</a>
-        </nav>
-        <button id="theme-toggle" class="ml-2">Dark Mode</button>
+    <section id="hero" class="text-center mb-10">
         <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Chicago's Culinary Scene</h1>
         <p class="text-lg text-gray-600">An Interactive Guide to the City's Top Eateries</p>
         <button id="open-full-report-btn" class="mt-4 px-6 py-2 bg-slate-700 text-white rounded-full text-md font-medium hover:bg-slate-800 transition">Read the Full Culinary Report</button>
-    </header>
+    </section>
 
     <main>
         <section id="filters" class="mb-12 bg-white rounded-xl shadow-md p-6">
@@ -233,67 +243,70 @@
 
 <script>
 const restaurantData = [
-    { rank:1, name:"Alinea", price:"$$$$", cuisine:"Modern European", michelin:"***", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"A beacon of modern gastronomy." },
-    { rank:2, name:"Smyth", price:"$$$$", cuisine:"Contemporary American", michelin:"***", holeInTheWall:false, takeout:false, location:"West Loop", description:"Smyth blends artistry and warmth." },
-    { rank:3, name:"Oriole", price:"$$$$", cuisine:"Contemporary American", michelin:"**", holeInTheWall:false, takeout:false, location:"West Loop", description:"Oriole specializes in Contemporary American cuisine." },
-    { rank:4, name:"Ever", price:"$$$$", cuisine:"Contemporary", michelin:"**", holeInTheWall:false, takeout:false, location:"West Loop", description:"Ever offers a memorable tasting menu." },
-    { rank:5, name:"Moody Tongue", price:"$$$", cuisine:"Brewery", michelin:"**", holeInTheWall:false, takeout:false, location:"South Loop", description:"Brewery with a culinary focus." },
-    { rank:6, name:"Indienne", price:"$$$$", cuisine:"Indian", michelin:"*", holeInTheWall:false, takeout:false, location:"River North", description:"Sophisticated Indian cuisine." },
-    { rank:7, name:"Next", price:"$$$$", cuisine:"Innovative", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Constantly evolving themed menus." },
-    { rank:8, name:"Mako", price:"$$$$", cuisine:"Japanese (Omakase)", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Focused omakase experience." },
-    { rank:9, name:"Elske", price:"$$$$", cuisine:"American", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Seasonal ingredients and value-driven." },
-    { rank:10, name:"Sepia", price:"$$$$", cuisine:"Contemporary American", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Tradition with modern flair." },
-    { rank:11, name:"Boka", price:"$$$", cuisine:"Contemporary American", michelin:"*", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"Long-standing fine-dining beacon." },
-    { rank:12, name:"Topolobampo", price:"$$$$", cuisine:"Mexican", michelin:"*", holeInTheWall:false, takeout:false, location:"River North", description:"Sophisticated regional Mexican." },
-    { rank:13, name:"Galit", price:"$$$$", cuisine:"Middle Eastern", michelin:"*", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"Creative Middle Eastern menus." },
-    { rank:14, name:"Omakase Yume", price:"$$$$", cuisine:"Japanese (Omakase)", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Daily changing omakase." },
-    { rank:15, name:"Shaw's Crab House & Oyster Bar", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Iconic seafood house." },
-    { rank:16, name:"Joe's Seafood, Prime Steak & Stone Crab", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Partnership with Miami's legendary Joe's." },
-    { rank:17, name:"Steak 48", price:"$$$", cuisine:"Steakhouse", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Fine steaks and seafood." },
-    { rank:18, name:"Chicago Cut Steakhouse", price:"$$$$", cuisine:"Steakhouse", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Riverfront steakhouse." },
-    { rank:19, name:"The Evie", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Upscale dining destination." },
-    { rank:20, name:"The Hampton Social - Streeterville", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Streeterville", description:"Summer-inspired atmosphere." },
-    { rank:21, name:"Ocean Prime", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Elevated dining experience." },
-    { rank:22, name:"Labriola Chicago", price:"$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"Near Magnificent Mile", description:"Italian American cuisine." },
-    { rank:23, name:"Acanto", price:"$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:true, location:"Downtown / Loop", description:"Across from Millennium Park." },
-    { rank:24, name:"Avec West Loop", price:"$$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop", description:"Wine-focused restaurant." },
-    { rank:25, name:"Girl & the Goat", price:"$$$", cuisine:"Contemporary American", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Bold shareable dishes." },
-    { rank:26, name:"Monteverde Restaurant & Pastificio", price:"$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Rustic Italian dishes." },
-    { rank:27, name:"Rose Mary", price:"$$$$", cuisine:"Croatian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Adriatic-inspired hotspot." },
-    { rank:28, name:"Bar Mar", price:"$$", cuisine:"Spanish", michelin:false, holeInTheWall:false, takeout:false, location:"Loop", description:"Seafood celebration." },
-    { rank:29, name:"Adalina", price:"$$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"Gold Coast / River North", description:"Fine dining Italian." },
-    { rank:30, name:"Alla Vita", price:"$$$", cuisine:"Contemporary Italian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Homemade pasta." },
-    { rank:31, name:"Cabra - Chicago", price:"$$$", cuisine:"Peruvian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Rooftop dining." },
-    { rank:32, name:"The Berghoff Restaurant", price:"$$$", cuisine:"German", michelin:false, holeInTheWall:true, takeout:false, location:"Downtown / Loop", description:"Chicago landmark." },
-    { rank:33, name:"Remington's", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Versatile restaurant." },
-    { rank:34, name:"Elephant & Castle - Chicago Wabash Ave.", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Lakeshore East", description:"British pub fare." },
-    { rank:35, name:"Sweetwater Tavern and Grille", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Vibrant bar and restaurant." },
-    { rank:36, name:"State and Lake Chicago Tavern", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Comfort food classics." },
-    { rank:37, name:"Broken English Taco Pub - Lake Street", price:"$$$$", cuisine:"Mexican", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Creative tacos." },
-    { rank:38, name:"Lou Malnati's - Chicago, Michigan Ave.", price:"$$$", cuisine:"Pizzeria", michelin:false, holeInTheWall:false, takeout:true, location:"River North", description:"Legendary deep dish pizza." },
-    { rank:39, name:"The Purple Pig", price:"$$", cuisine:"Mediterranean Cuisine", michelin:false, holeInTheWall:false, takeout:true, location:"Michigan Avenue", description:"Focus on pork, cheese and wine." },
-    { rank:40, name:"Billy Goat Tavern", price:"$", cuisine:"Burgers", michelin:false, holeInTheWall:true, takeout:true, location:"Multiple downtown locations", description:"Classic Chicago institution." },
-    { rank:41, name:"Cafecito", price:"$", cuisine:"Cuban", michelin:false, holeInTheWall:true, takeout:true, location:"South Loop", description:"Popular Cubano sandwiches." },
-    { rank:42, name:"Pierogi Heaven", price:"$", cuisine:"Polish", michelin:false, holeInTheWall:true, takeout:true, location:"The Loop", description:"Savory pierogies." },
-    { rank:43, name:"Jim's Original", price:"$", cuisine:"Fast Food", michelin:false, holeInTheWall:true, takeout:true, location:"Near Expressway", description:"Classic spot since 1939." },
-    { rank:44, name:"Harold's Chicken Shack", price:"$$", cuisine:"Chicken", michelin:false, holeInTheWall:true, takeout:true, location:"Multiple downtown locations", description:"Chicago staple for fried chicken." },
-    { rank:45, name:"Athena Restaurant", price:"$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop (Greektown)", description:"Authentic Greek cuisine." },
-    { rank:46, name:"Pita Pita Mediterranean Grill", price:"$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"North Loop", description:"Tasty wraps and bowls." },
-    { rank:47, name:"Gaylord Fine Indian Cuisine", price:"$$", cuisine:"Indian", michelin:false, holeInTheWall:false, takeout:true, location:"Downtown Chicago", description:"Authentic Indian flavors." },
-    { rank:48, name:"Do-Rite Donuts & Chicken", price:"$", cuisine:"Donuts", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Artisanal donuts and chicken." },
-    { rank:49, name:"Goddess and the Baker", price:"$$", cuisine:"Cafe", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Baked goods and coffee." },
-    { rank:50, name:"The Fat Shallot", price:"$$", cuisine:"Sandwiches", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Gourmet sandwiches." },
-    { rank:51, name:"Poke Poke", price:"$$", cuisine:"Seafood (Poke Bowls)", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Customizable poke bowls." },
-    { rank:52, name:"Duck Duck Goat", price:"$$$$", cuisine:"Chinese", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop", description:"Hand-pulled noodles and dumplings." },
-    { rank:53, name:"Niu Japanese Fusion", price:"$$", cuisine:"Japanese", michelin:false, holeInTheWall:false, takeout:true, location:"River North", description:"Diverse Japanese menu." },
-    { rank:54, name:"Triple Crown Restaurant", price:"$", cuisine:"Chinese", michelin:false, holeInTheWall:false, takeout:true, location:"Chinatown", description:"Long-standing staple." },
-    { rank:55, name:"Church's Texas Chicken", price:"$$", cuisine:"Chicken", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple Chicago", description:"Classic comfort food." },
-    { rank:56, name:"The Berghoff Restaurant", price:"$$$", cuisine:"German", michelin:false, holeInTheWall:true, takeout:false, location:"Downtown / Loop", description:"Family-run since 1898." },
-    { rank:57, name:"Remington's", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Sleek and versatile." }
+    { rank:1, name:"Alinea", price:"$$$$", cuisine:"Modern European", michelin:"***", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"World renowned for boundary-pushing tasting menus and theatrical presentations." },
+    { rank:2, name:"Smyth", price:"$$$$", cuisine:"Contemporary American", michelin:"***", holeInTheWall:false, takeout:false, location:"West Loop", description:"Seasonal Midwestern flavors served in an intimate, Michelin-starred setting." },
+    { rank:3, name:"Oriole", price:"$$$$", cuisine:"Contemporary American", michelin:"**", holeInTheWall:false, takeout:false, location:"West Loop", description:"Refined tasting experience offering meticulous two-star Michelin cuisine." },
+    { rank:4, name:"Ever", price:"$$$$", cuisine:"Contemporary", michelin:"**", holeInTheWall:false, takeout:false, location:"West Loop", description:"Chef Curtis Duffy presents inventive courses in a sleek dining room." },
+    { rank:5, name:"Moody Tongue", price:"$$$", cuisine:"Brewery", michelin:"**", holeInTheWall:false, takeout:false, location:"South Loop", description:"Known for pairing artisanal beers with elevated seasonal dishes." },
+    { rank:6, name:"Indienne", price:"$$$$", cuisine:"Indian", michelin:"*", holeInTheWall:false, takeout:false, location:"River North", description:"Upscale restaurant blending classic Indian flavors with modern technique." },
+    { rank:7, name:"Next", price:"$$$$", cuisine:"Innovative", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Grant Achatz's concept spot featuring constantly evolving themed menus." },
+    { rank:8, name:"Mako", price:"$$$$", cuisine:"Japanese (Omakase)", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Intimate sushi bar dedicated to a carefully crafted omakase experience." },
+    { rank:9, name:"Elske", price:"$$$$", cuisine:"American", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Scandinavian-inspired dishes highlighting seasonal ingredients and value." },
+    { rank:10, name:"Sepia", price:"$$$$", cuisine:"Contemporary American", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Historic print shop turned restaurant serving modern seasonal fare." },
+    { rank:11, name:"Boka", price:"$$$", cuisine:"Contemporary American", michelin:"*", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"Veteran fine-dining destination emphasizing service and new American cuisine." },
+    { rank:12, name:"Topolobampo", price:"$$$$", cuisine:"Mexican", michelin:"*", holeInTheWall:false, takeout:false, location:"River North", description:"Rick Bayless showcases refined regional Mexican cooking and bold flavors." },
+    { rank:13, name:"Galit", price:"$$$$", cuisine:"Middle Eastern", michelin:"*", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"Warm neighborhood spot offering inventive takes on Middle Eastern cuisine." },
+    { rank:14, name:"Omakase Yume", price:"$$$$", cuisine:"Japanese (Omakase)", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Chef Sangtae Park crafts an intimate, ever-changing omakase." },
+    { rank:15, name:"Shaw's Crab House & Oyster Bar", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Classic Chicago seafood institution famous for fresh oysters and crab." },
+    { rank:16, name:"Joe's Seafood, Prime Steak & Stone Crab", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Chicago outpost of the Miami icon celebrated for stone crab claws." },
+    { rank:17, name:"Steak 48", price:"$$$", cuisine:"Steakhouse", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Luxurious steakhouse serving prime cuts with upscale service." },
+    { rank:18, name:"Chicago Cut Steakhouse", price:"$$$$", cuisine:"Steakhouse", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Riverfront destination boasting dry-aged beef and an extensive wine list." },
+    { rank:19, name:"The Evie", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Chic eatery delivering polished plates alongside craft cocktails." },
+    { rank:20, name:"The Hampton Social - Streeterville", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Streeterville", description:"Coastal-inspired venue known for rosé and a lively rooftop scene." },
+    { rank:21, name:"Ocean Prime", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Elegant chain serving prime steaks and seafood in sophisticated digs." },
+    { rank:22, name:"Labriola Chicago", price:"$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"Near Magnificent Mile", description:"Bustling Italian-American spot with house-made breads and pizzas." },
+    { rank:23, name:"Acanto", price:"$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:true, location:"Downtown / Loop", description:"Italian dishes and cocktails located right across from Millennium Park." },
+    { rank:24, name:"Avec West Loop", price:"$$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop", description:"Wine-centric restaurant offering Mediterranean small plates and wood-fired fare." },
+    { rank:25, name:"Girl & the Goat", price:"$$$", cuisine:"Contemporary American", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Stephanie Izard’s famed spot serving bold, shareable dishes." },
+    { rank:26, name:"Monteverde Restaurant & Pastificio", price:"$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Chef Sarah Grueneberg showcases handmade pastas and Italian classics." },
+    { rank:27, name:"Rose Mary", price:"$$$$", cuisine:"Croatian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Top Chef winner Joe Flamm merges Croatian and Italian influences." },
+    { rank:28, name:"Bar Mar", price:"$$", cuisine:"Spanish", michelin:false, holeInTheWall:false, takeout:false, location:"Loop", description:"José Andrés’ playful seafood bar celebrating Spanish-inspired dishes." },
+    { rank:29, name:"Adalina", price:"$$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"Gold Coast / River North", description:"Glamorous restaurant delivering polished modern Italian cuisine." },
+    { rank:30, name:"Alla Vita", price:"$$$", cuisine:"Contemporary Italian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Approachable spot celebrating fresh pastas and wood-oven pizzas." },
+    { rank:31, name:"Cabra - Chicago", price:"$$$", cuisine:"Peruvian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Peruvian rooftop destination from Stephanie Izard with shareable plates." },
+    { rank:32, name:"The Berghoff Restaurant", price:"$$$", cuisine:"German", michelin:false, holeInTheWall:true, takeout:false, location:"Downtown / Loop", description:"Historic German-American restaurant operating since 1898." },
+    { rank:33, name:"Remington's", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Upscale bistro offering steaks, salads and a broad wine list." },
+    { rank:34, name:"Elephant & Castle - Chicago Wabash Ave.", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Lakeshore East", description:"Relaxed British pub classics served in a downtown setting." },
+    { rank:35, name:"Sweetwater Tavern and Grille", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Modern American bar with a popular patio and energetic vibe." },
+    { rank:36, name:"State and Lake Chicago Tavern", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Hotel tavern serving elevated comfort food and craft beer." },
+    { rank:37, name:"Broken English Taco Pub - Lake Street", price:"$$$$", cuisine:"Mexican", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Colorful cantina dishing out creative tacos and margaritas." },
+    { rank:38, name:"Lou Malnati's - Chicago, Michigan Ave.", price:"$$$", cuisine:"Pizzeria", michelin:false, holeInTheWall:false, takeout:true, location:"River North", description:"Home of Chicago's famous deep dish pizza since 1971." },
+    { rank:39, name:"The Purple Pig", price:"$$", cuisine:"Mediterranean Cuisine", michelin:false, holeInTheWall:false, takeout:true, location:"Michigan Avenue", description:"Mediterranean-inspired small plates with a focus on pork and wine." },
+    { rank:40, name:"Billy Goat Tavern", price:"$", cuisine:"Burgers", michelin:false, holeInTheWall:true, takeout:true, location:"Multiple downtown locations", description:"Iconic no-frills burger joint immortalized by SNL's cheezborger skit." },
+    { rank:41, name:"Cafecito", price:"$", cuisine:"Cuban", michelin:false, holeInTheWall:true, takeout:true, location:"South Loop", description:"Cozy Cuban café known for pressed sandwiches and strong coffee." },
+    { rank:42, name:"Pierogi Heaven", price:"$", cuisine:"Polish", michelin:false, holeInTheWall:true, takeout:true, location:"The Loop", description:"Counter-service spot specializing in homemade Polish dumplings." },
+    { rank:43, name:"Jim's Original", price:"$", cuisine:"Fast Food", michelin:false, holeInTheWall:true, takeout:true, location:"Near Expressway", description:"Beloved hot dog stand serving Polish sausages since the 1930s." },
+    { rank:44, name:"Harold's Chicken Shack", price:"$$", cuisine:"Chicken", michelin:false, holeInTheWall:true, takeout:true, location:"Multiple downtown locations", description:"Locally loved fried chicken chain with a devoted following." },
+    { rank:45, name:"Athena Restaurant", price:"$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop (Greektown)", description:"Longtime Greektown staple with a spacious patio and classic dishes." },
+    { rank:46, name:"Pita Pita Mediterranean Grill", price:"$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"North Loop", description:"Casual stop for shawarma, falafel and build-your-own plates." },
+    { rank:47, name:"Gaylord Fine Indian Cuisine", price:"$$", cuisine:"Indian", michelin:false, holeInTheWall:false, takeout:true, location:"Downtown Chicago", description:"Traditional Indian eatery offering tandoori specialties and curries." },
+    { rank:48, name:"Do-Rite Donuts & Chicken", price:"$", cuisine:"Donuts", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Famed for small-batch doughnuts and spicy fried chicken sandwiches." },
+    { rank:49, name:"Goddess and the Baker", price:"$$", cuisine:"Cafe", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Trendy café serving pastries, salads and espresso drinks." },
+    { rank:50, name:"The Fat Shallot", price:"$$", cuisine:"Sandwiches", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Food-truck-turned-shop featuring inventive gourmet sandwiches." },
+    { rank:51, name:"Poke Poke", price:"$$", cuisine:"Seafood (Poke Bowls)", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Fast-casual spot crafting fresh Hawaiian-style poke bowls." },
+    { rank:52, name:"Duck Duck Goat", price:"$$$$", cuisine:"Chinese", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop", description:"Funky Chinatown-inspired restaurant from Stephanie Izard." },
+    { rank:53, name:"Niu Japanese Fusion", price:"$$", cuisine:"Japanese", michelin:false, holeInTheWall:false, takeout:true, location:"River North", description:"Wide-ranging sushi and modern Japanese fare." },
+    { rank:54, name:"Triple Crown Restaurant", price:"$", cuisine:"Chinese", michelin:false, holeInTheWall:false, takeout:true, location:"Chinatown", description:"Long-standing dim sum destination in Chinatown." },
+    { rank:55, name:"Church's Texas Chicken", price:"$$", cuisine:"Chicken", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple Chicago", description:"National chain dishing up crispy fried chicken and sides." },
+    { rank:56, name:"The Berghoff Restaurant", price:"$$$", cuisine:"German", michelin:false, holeInTheWall:true, takeout:false, location:"Downtown / Loop", description:"Family-run German-American institution dating back to 1898." },
+    { rank:57, name:"Remington's", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Upscale American bistro offering steaks and an extensive wine list." }
 ];
 
 let activeAttributeFilters = new Set();
 let priceChart, cuisineChart;
+function cssVar(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 
 function createRestaurantCard(r) {
     const card = document.createElement('div');
@@ -354,8 +367,13 @@ function updatePriceChart(data){
     const chartData=labels.map(l=>counts[l]);
     const colors={"$":"#28a745","$$":"#ffc107","$$$":"#fd7e14","$$$$":"#dc3545"};
     const bg=labels.map(l=>colors[l]);
-    if(priceChart){priceChart.data.labels=labels;priceChart.data.datasets[0].data=chartData;priceChart.data.datasets[0].backgroundColor=bg;priceChart.update();}
-    else{const ctx=document.getElementById('priceChart').getContext('2d');priceChart=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:chartData,backgroundColor:bg,borderColor:'#FDFBF8',borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});}
+    const border=cssVar('--bg-color');
+    const text=cssVar('--text-color');
+    if(priceChart){priceChart.data.labels=labels;priceChart.data.datasets[0].data=chartData;priceChart.data.datasets[0].backgroundColor=bg;priceChart.options.plugins.legend.labels.color=text;priceChart.update();}
+    else{
+        const ctx=document.getElementById('priceChart').getContext('2d');
+        priceChart=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:chartData,backgroundColor:bg,borderColor:border,borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:text}}}}});
+    }
 }
 
 function updateCuisineChart(data){
@@ -366,8 +384,20 @@ function updateCuisineChart(data){
     const chartData=sorted.map(s=>s[1]);
     const colors=['#6B7280','#8D6C9F','#A7D9A2','#E87C7C','#5DADE2','#F4B942','#C3AED6'];
     const bg=labels.map((_,i)=>colors[i%colors.length]);
-    if(cuisineChart){cuisineChart.data.labels=labels;cuisineChart.data.datasets[0].data=chartData;cuisineChart.data.datasets[0].backgroundColor=bg;cuisineChart.update();}
-    else{const ctx=document.getElementById('cuisineChart').getContext('2d');cuisineChart=new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:'Number of Restaurants',data:chartData,backgroundColor:bg,borderColor:'#4B5563',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}}});}
+    const text=cssVar('--text-color');
+    const border=text;
+    if(cuisineChart){
+        cuisineChart.data.labels=labels;
+        cuisineChart.data.datasets[0].data=chartData;
+        cuisineChart.data.datasets[0].backgroundColor=bg;
+        cuisineChart.options.scales.x.ticks.color=text;
+        cuisineChart.options.scales.y.ticks.color=text;
+        cuisineChart.options.plugins.legend.labels.color=text;
+        cuisineChart.update();
+    } else {
+        const ctx=document.getElementById('cuisineChart').getContext('2d');
+        cuisineChart=new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:'Number of Restaurants',data:chartData,backgroundColor:bg,borderColor:border,borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false,labels:{color:text}}},scales:{x:{beginAtZero:true,ticks:{stepSize:1,color:text}},y:{ticks:{color:text}}}}});
+    }
 }
 
 const themeToggle=document.getElementById('theme-toggle');
@@ -384,6 +414,7 @@ themeToggle.addEventListener('click',()=>{
     const theme=document.body.classList.contains('dark')?'dark':'light';
     localStorage.setItem('theme',theme);
     updateToggleText();
+    filterAndRender();
 });
 applyStoredTheme();
 updateToggleText();
