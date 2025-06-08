@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicago Eateries</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #007bff;
+        }
+        .dark {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #66b0ff;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 1rem;
+        }
+        nav {
+            margin-bottom: 1rem;
+        }
+        nav a {
+            margin: 0 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        #filters {
+            margin-bottom: 1rem;
+        }
+        #theme-toggle {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            border: none;
+            color: var(--bg-color);
+            border-radius: 4px;
+            margin-left: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="guide.html">2025 Guide</a>
+        <a href="eateries.html">Top Eateries</a>
+    </nav>
+    <h1>Top 100 Eateries in Downtown Chicago</h1>
+
+    <div id="filters">
+        <label>Cuisine:
+            <select id="cuisine-filter">
+                <option value="all">All</option>
+                <option>American</option>
+                <option>Italian</option>
+                <option>Chinese</option>
+                <option>Mexican</option>
+                <option>Indian</option>
+            </select>
+        </label>
+        <label>Price:
+            <select id="price-filter">
+                <option value="all">All</option>
+                <option value="$">$</option>
+                <option value="$$">$$</option>
+                <option value="$$$">$$$</option>
+            </select>
+        </label>
+        <label><input type="checkbox" id="star-filter"> Michelin Star Restaurants</label>
+        <label><input type="checkbox" id="hole-filter"> Hole In The Wall</label>
+        <label><input type="checkbox" id="takeout-filter"> Takeout</label>
+        <button id="theme-toggle">Dark Mode</button>
+    </div>
+
+    <table id="eatery-table">
+        <thead>
+            <tr><th>Name</th><th>Cuisine</th><th>Price</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const cuisineSelect = document.getElementById('cuisine-filter');
+        const priceSelect = document.getElementById('price-filter');
+        const starFilter = document.getElementById('star-filter');
+        const holeFilter = document.getElementById('hole-filter');
+        const takeoutFilter = document.getElementById('takeout-filter');
+        const tableBody = document.querySelector('#eatery-table tbody');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        const cuisines = ['American', 'Italian', 'Chinese', 'Mexican', 'Indian'];
+        const prices = ['$', '$$', '$$$'];
+        const eateries = [];
+        for (let i = 1; i <= 100; i++) {
+            eateries.push({
+                name: `Restaurant ${i}`,
+                cuisine: cuisines[i % cuisines.length],
+                price: prices[i % prices.length],
+                star: i % 10 === 0,
+                hole: i % 4 === 0,
+                takeout: i % 3 === 0
+            });
+        }
+
+        function updateToggleText() {
+            if (document.body.classList.contains('dark')) {
+                themeToggle.textContent = 'Light Mode';
+            } else {
+                themeToggle.textContent = 'Dark Mode';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            updateToggleText();
+        });
+
+        function renderList() {
+            tableBody.innerHTML = '';
+            eateries.forEach(e => {
+                if (cuisineSelect.value !== 'all' && e.cuisine !== cuisineSelect.value) return;
+                if (priceSelect.value !== 'all' && e.price !== priceSelect.value) return;
+                if (starFilter.checked && !e.star) return;
+                if (holeFilter.checked && !e.hole) return;
+                if (takeoutFilter.checked && !e.takeout) return;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${e.name}</td><td>${e.cuisine}</td><td>${e.price}</td>`;
+                tableBody.appendChild(row);
+            });
+        }
+
+        cuisineSelect.addEventListener('change', renderList);
+        priceSelect.addEventListener('change', renderList);
+        starFilter.addEventListener('change', renderList);
+        holeFilter.addEventListener('change', renderList);
+        takeoutFilter.addEventListener('change', renderList);
+
+        updateToggleText();
+        renderList();
+    </script>
+</body>
+</html>
