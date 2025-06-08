@@ -3,183 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicago Eateries</title>
+    <title>Interactive Guide to Chicago's Top Eateries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --accent-color: #007bff;
-        }
-        .dark {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --accent-color: #66b0ff;
-        }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            padding: 70px 1rem 1rem; /* top padding for fixed header */
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
         }
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--bg-color);
-            padding: 1rem 0;
-            text-align: center;
-            z-index: 1000;
-        }
-        nav a {
-            margin: 0 0.5rem;
-            color: var(--text-color);
-            text-decoration: none;
-        }
-        #filters {
-            margin-bottom: 1rem;
-        }
-        #theme-toggle {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            cursor: pointer;
-            background-color: var(--accent-color);
-            border: none;
-            color: var(--bg-color);
-            border-radius: 4px;
-            margin-left: 1rem;
-        }
-        table {
+        .chart-container {
+            position: relative;
             width: 100%;
-            border-collapse: collapse;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
         }
-        th, td {
-            padding: 0.5rem;
-            border-bottom: 1px solid var(--accent-color);
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .filter-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-button.active {
+            background-color: #D66A55;
+            color: #FFFFFF;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .restaurant-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .restaurant-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6B7280;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="guide.html">2025 Guide</a>
-            <a href="eateries.html">Top Eateries</a>
-        </nav>
+<body class="antialiased">
+
+<div id="app" class="container mx-auto p-4 md:p-8">
+    <header class="text-center mb-10">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Chicago's Culinary Scene</h1>
+        <p class="text-lg text-gray-600">An Interactive Guide to the City's Top Eateries</p>
+        <button id="open-full-report-btn" class="mt-4 px-6 py-2 bg-slate-700 text-white rounded-full text-md font-medium hover:bg-slate-800 transition">Read the Full Culinary Report</button>
     </header>
+
     <main>
-    <h1>Top 100 Eateries in Downtown Chicago</h1>
+        <section id="filters" class="mb-12 bg-white rounded-xl shadow-md p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search by Name or Cuisine</label>
+                    <input type="text" id="search" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500" placeholder="e.g., Alinea or Italian">
+                </div>
+                <div>
+                    <label for="price-filter" class="block text-sm font-medium text-gray-700 mb-2">Filter by Price</label>
+                    <select id="price-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500">
+                        <option value="all">All Prices</option>
+                        <option value="$">$</option>
+                        <option value="$$">$$</option>
+                        <option value="$$$">$$$</option>
+                        <option value="$$$$">$$$$</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Attributes</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filter-button px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm" data-filter="michelin">Michelin Star ★</button>
+                        <button class="filter-button px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm" data-filter="holeInTheWall">Hole In The Wall</button>
+                        <button class="filter-button px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm" data-filter="takeout">Great Takeout</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <div id="filters">
-        <label>Cuisine:
-            <select id="cuisine-filter">
-                <option value="all">All</option>
-                <option>American</option>
-                <option>Italian</option>
-                <option>Chinese</option>
-                <option>Mexican</option>
-                <option>Indian</option>
-            </select>
-        </label>
-        <label>Price:
-            <select id="price-filter">
-                <option value="all">All</option>
-                <option value="$">$</option>
-                <option value="$$">$$</option>
-                <option value="$$$">$$$</option>
-            </select>
-        </label>
-        <label><input type="checkbox" id="star-filter"> Michelin Star Restaurants</label>
-        <label><input type="checkbox" id="hole-filter"> Hole In The Wall</label>
-        <label><input type="checkbox" id="takeout-filter"> Takeout</label>
-        <button id="theme-toggle">Dark Mode</button>
-    </div>
+        <section id="dashboard" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800">Restaurant Landscape</h2>
+                <p class="text-md text-gray-600 mt-1">A visual overview of Chicago's top dining spots based on your filters.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-center mb-4">Eateries by Price</h3>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-center mb-4">Top Cuisines</h3>
+                    <div class="chart-container" style="max-width:600px; height:350px;">
+                        <canvas id="cuisineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <table id="eatery-table">
-        <thead>
-            <tr><th>Name</th><th>Cuisine</th><th>Price</th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+        <section id="restaurant-list-section">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Restaurant Guide</h2>
+                <div class="text-gray-600">Showing <span id="restaurant-count" class="font-bold">0</span> results</div>
+            </div>
+            <div id="loader-container" class="flex justify-center py-10"><div class="loader"></div></div>
+            <div id="restaurant-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
+            <p id="no-results" class="text-center py-10 text-gray-500 hidden">No restaurants match your criteria.</p>
+        </section>
     </main>
 
-    <script>
-        const cuisineSelect = document.getElementById('cuisine-filter');
-        const priceSelect = document.getElementById('price-filter');
-        const starFilter = document.getElementById('star-filter');
-        const holeFilter = document.getElementById('hole-filter');
-        const takeoutFilter = document.getElementById('takeout-filter');
-        const tableBody = document.querySelector('#eatery-table tbody');
-        const themeToggle = document.getElementById('theme-toggle');
+    <footer class="text-center mt-16 py-6 border-t border-gray-200">
+        <p class="text-gray-500">Application designed from the "Connoisseur's Guide to Downtown Chicago's Top Eateries" report.</p>
+    </footer>
+</div>
 
-        const cuisines = ['American', 'Italian', 'Chinese', 'Mexican', 'Indian'];
-        const prices = ['$', '$$', '$$$'];
-        const eateries = [];
-        for (let i = 1; i <= 100; i++) {
-            eateries.push({
-                name: `Restaurant ${i}`,
-                cuisine: cuisines[i % cuisines.length],
-                price: prices[i % prices.length],
-                star: i % 10 === 0,
-                hole: i % 4 === 0,
-                takeout: i % 3 === 0
-            });
-        }
+<div id="restaurant-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h3 id="modal-restaurant-name" class="text-2xl font-bold text-gray-800 mb-3"></h3>
+        <p id="modal-restaurant-description" class="text-gray-700 leading-relaxed"></p>
+    </div>
+</div>
 
-        function updateToggleText() {
-            if (document.body.classList.contains('dark')) {
-                themeToggle.textContent = 'Light Mode';
-            } else {
-                themeToggle.textContent = 'Dark Mode';
-            }
-        }
+<div id="full-report-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="close-report-btn">&times;</span>
+        <h3 class="text-2xl font-bold text-gray-800 mb-3">Full Culinary Report: Downtown Chicago's Top Eateries</h3>
+        <div id="full-report-content" class="text-gray-700 prose max-w-none"></div>
+    </div>
+</div>
 
-        function applyStoredTheme() {
-            const stored = localStorage.getItem('theme');
-            if (stored === 'dark') {
-                document.body.classList.add('dark');
-            }
-        }
+<script>
+const restaurantData = [
+    { rank:1, name:"Alinea", price:"$$$$", cuisine:"Modern European", michelin:"***", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"A beacon of modern gastronomy." },
+    { rank:2, name:"Smyth", price:"$$$$", cuisine:"Contemporary American", michelin:"***", holeInTheWall:false, takeout:false, location:"West Loop", description:"Smyth blends artistry and warmth." },
+    { rank:3, name:"Oriole", price:"$$$$", cuisine:"Contemporary American", michelin:"**", holeInTheWall:false, takeout:false, location:"West Loop", description:"Oriole specializes in Contemporary American cuisine." },
+    { rank:4, name:"Ever", price:"$$$$", cuisine:"Contemporary", michelin:"**", holeInTheWall:false, takeout:false, location:"West Loop", description:"Ever offers a memorable tasting menu." },
+    { rank:5, name:"Moody Tongue", price:"$$$", cuisine:"Brewery", michelin:"**", holeInTheWall:false, takeout:false, location:"South Loop", description:"Brewery with a culinary focus." },
+    { rank:6, name:"Indienne", price:"$$$$", cuisine:"Indian", michelin:"*", holeInTheWall:false, takeout:false, location:"River North", description:"Sophisticated Indian cuisine." },
+    { rank:7, name:"Next", price:"$$$$", cuisine:"Innovative", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Constantly evolving themed menus." },
+    { rank:8, name:"Mako", price:"$$$$", cuisine:"Japanese (Omakase)", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Focused omakase experience." },
+    { rank:9, name:"Elske", price:"$$$$", cuisine:"American", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Seasonal ingredients and value-driven." },
+    { rank:10, name:"Sepia", price:"$$$$", cuisine:"Contemporary American", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Tradition with modern flair." },
+    { rank:11, name:"Boka", price:"$$$", cuisine:"Contemporary American", michelin:"*", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"Long-standing fine-dining beacon." },
+    { rank:12, name:"Topolobampo", price:"$$$$", cuisine:"Mexican", michelin:"*", holeInTheWall:false, takeout:false, location:"River North", description:"Sophisticated regional Mexican." },
+    { rank:13, name:"Galit", price:"$$$$", cuisine:"Middle Eastern", michelin:"*", holeInTheWall:false, takeout:false, location:"Lincoln Park", description:"Creative Middle Eastern menus." },
+    { rank:14, name:"Omakase Yume", price:"$$$$", cuisine:"Japanese (Omakase)", michelin:"*", holeInTheWall:false, takeout:false, location:"West Loop", description:"Daily changing omakase." },
+    { rank:15, name:"Shaw's Crab House & Oyster Bar", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Iconic seafood house." },
+    { rank:16, name:"Joe's Seafood, Prime Steak & Stone Crab", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Partnership with Miami's legendary Joe's." },
+    { rank:17, name:"Steak 48", price:"$$$", cuisine:"Steakhouse", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Fine steaks and seafood." },
+    { rank:18, name:"Chicago Cut Steakhouse", price:"$$$$", cuisine:"Steakhouse", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Riverfront steakhouse." },
+    { rank:19, name:"The Evie", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"River North", description:"Upscale dining destination." },
+    { rank:20, name:"The Hampton Social - Streeterville", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Streeterville", description:"Summer-inspired atmosphere." },
+    { rank:21, name:"Ocean Prime", price:"$$$$", cuisine:"Seafood", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Elevated dining experience." },
+    { rank:22, name:"Labriola Chicago", price:"$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"Near Magnificent Mile", description:"Italian American cuisine." },
+    { rank:23, name:"Acanto", price:"$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:true, location:"Downtown / Loop", description:"Across from Millennium Park." },
+    { rank:24, name:"Avec West Loop", price:"$$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop", description:"Wine-focused restaurant." },
+    { rank:25, name:"Girl & the Goat", price:"$$$", cuisine:"Contemporary American", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Bold shareable dishes." },
+    { rank:26, name:"Monteverde Restaurant & Pastificio", price:"$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Rustic Italian dishes." },
+    { rank:27, name:"Rose Mary", price:"$$$$", cuisine:"Croatian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Adriatic-inspired hotspot." },
+    { rank:28, name:"Bar Mar", price:"$$", cuisine:"Spanish", michelin:false, holeInTheWall:false, takeout:false, location:"Loop", description:"Seafood celebration." },
+    { rank:29, name:"Adalina", price:"$$$$", cuisine:"Italian", michelin:false, holeInTheWall:false, takeout:false, location:"Gold Coast / River North", description:"Fine dining Italian." },
+    { rank:30, name:"Alla Vita", price:"$$$", cuisine:"Contemporary Italian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Homemade pasta." },
+    { rank:31, name:"Cabra - Chicago", price:"$$$", cuisine:"Peruvian", michelin:false, holeInTheWall:false, takeout:false, location:"West Loop", description:"Rooftop dining." },
+    { rank:32, name:"The Berghoff Restaurant", price:"$$$", cuisine:"German", michelin:false, holeInTheWall:true, takeout:false, location:"Downtown / Loop", description:"Chicago landmark." },
+    { rank:33, name:"Remington's", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Versatile restaurant." },
+    { rank:34, name:"Elephant & Castle - Chicago Wabash Ave.", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Lakeshore East", description:"British pub fare." },
+    { rank:35, name:"Sweetwater Tavern and Grille", price:"$$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Vibrant bar and restaurant." },
+    { rank:36, name:"State and Lake Chicago Tavern", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Comfort food classics." },
+    { rank:37, name:"Broken English Taco Pub - Lake Street", price:"$$$$", cuisine:"Mexican", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Creative tacos." },
+    { rank:38, name:"Lou Malnati's - Chicago, Michigan Ave.", price:"$$$", cuisine:"Pizzeria", michelin:false, holeInTheWall:false, takeout:true, location:"River North", description:"Legendary deep dish pizza." },
+    { rank:39, name:"The Purple Pig", price:"$$", cuisine:"Mediterranean Cuisine", michelin:false, holeInTheWall:false, takeout:true, location:"Michigan Avenue", description:"Focus on pork, cheese and wine." },
+    { rank:40, name:"Billy Goat Tavern", price:"$", cuisine:"Burgers", michelin:false, holeInTheWall:true, takeout:true, location:"Multiple downtown locations", description:"Classic Chicago institution." },
+    { rank:41, name:"Cafecito", price:"$", cuisine:"Cuban", michelin:false, holeInTheWall:true, takeout:true, location:"South Loop", description:"Popular Cubano sandwiches." },
+    { rank:42, name:"Pierogi Heaven", price:"$", cuisine:"Polish", michelin:false, holeInTheWall:true, takeout:true, location:"The Loop", description:"Savory pierogies." },
+    { rank:43, name:"Jim's Original", price:"$", cuisine:"Fast Food", michelin:false, holeInTheWall:true, takeout:true, location:"Near Expressway", description:"Classic spot since 1939." },
+    { rank:44, name:"Harold's Chicken Shack", price:"$$", cuisine:"Chicken", michelin:false, holeInTheWall:true, takeout:true, location:"Multiple downtown locations", description:"Chicago staple for fried chicken." },
+    { rank:45, name:"Athena Restaurant", price:"$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop (Greektown)", description:"Authentic Greek cuisine." },
+    { rank:46, name:"Pita Pita Mediterranean Grill", price:"$$", cuisine:"Mediterranean", michelin:false, holeInTheWall:false, takeout:true, location:"North Loop", description:"Tasty wraps and bowls." },
+    { rank:47, name:"Gaylord Fine Indian Cuisine", price:"$$", cuisine:"Indian", michelin:false, holeInTheWall:false, takeout:true, location:"Downtown Chicago", description:"Authentic Indian flavors." },
+    { rank:48, name:"Do-Rite Donuts & Chicken", price:"$", cuisine:"Donuts", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Artisanal donuts and chicken." },
+    { rank:49, name:"Goddess and the Baker", price:"$$", cuisine:"Cafe", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Baked goods and coffee." },
+    { rank:50, name:"The Fat Shallot", price:"$$", cuisine:"Sandwiches", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Gourmet sandwiches." },
+    { rank:51, name:"Poke Poke", price:"$$", cuisine:"Seafood (Poke Bowls)", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple downtown", description:"Customizable poke bowls." },
+    { rank:52, name:"Duck Duck Goat", price:"$$$$", cuisine:"Chinese", michelin:false, holeInTheWall:false, takeout:true, location:"West Loop", description:"Hand-pulled noodles and dumplings." },
+    { rank:53, name:"Niu Japanese Fusion", price:"$$", cuisine:"Japanese", michelin:false, holeInTheWall:false, takeout:true, location:"River North", description:"Diverse Japanese menu." },
+    { rank:54, name:"Triple Crown Restaurant", price:"$", cuisine:"Chinese", michelin:false, holeInTheWall:false, takeout:true, location:"Chinatown", description:"Long-standing staple." },
+    { rank:55, name:"Church's Texas Chicken", price:"$$", cuisine:"Chicken", michelin:false, holeInTheWall:false, takeout:true, location:"Multiple Chicago", description:"Classic comfort food." },
+    { rank:56, name:"The Berghoff Restaurant", price:"$$$", cuisine:"German", michelin:false, holeInTheWall:true, takeout:false, location:"Downtown / Loop", description:"Family-run since 1898." },
+    { rank:57, name:"Remington's", price:"$$$", cuisine:"American", michelin:false, holeInTheWall:false, takeout:false, location:"Downtown / Loop", description:"Sleek and versatile." }
+];
 
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-            localStorage.setItem('theme', theme);
-            updateToggleText();
+let activeAttributeFilters = new Set();
+let priceChart, cuisineChart;
+
+function createRestaurantCard(r) {
+    const card = document.createElement('div');
+    card.className = 'restaurant-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-200';
+    let attributesHTML = '';
+    if (r.michelin) {
+        const stars = '★'.repeat(r.michelin.length);
+        attributesHTML += `<span class="inline-block bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-full uppercase mr-2">${stars} Michelin</span>`;
+    }
+    if (r.holeInTheWall) attributesHTML += `<span class="inline-block bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded-full uppercase mr-2">Hole In The Wall</span>`;
+    if (r.takeout) attributesHTML += `<span class="inline-block bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full uppercase">Great Takeout</span>`;
+    card.innerHTML = `<div class="p-6"><div class="flex justify-between items-start"><h3 class="text-xl font-bold text-gray-800 mb-1"><span class="text-gray-500 mr-2">#${r.rank}</span>${r.name}</h3><span class="text-lg font-semibold text-slate-600">${r.price}</span></div><p class="text-gray-600 mb-3">${r.cuisine} - <span class="text-gray-500 italic">${r.location}</span></p><div class="flex flex-wrap gap-2">${attributesHTML}</div></div>`;
+    card.addEventListener('click', ()=>{
+        document.getElementById('modal-restaurant-name').textContent = r.name;
+        document.getElementById('modal-restaurant-description').textContent = r.description || 'No detailed description.';
+        document.getElementById('restaurant-modal').style.display = 'flex';
+    });
+    return card;
+}
+
+function renderRestaurants(list) {
+    const grid = document.getElementById('restaurant-grid');
+    const noRes = document.getElementById('no-results');
+    grid.innerHTML = '';
+    if (list.length === 0) {
+        noRes.classList.remove('hidden');
+    } else {
+        noRes.classList.add('hidden');
+    }
+    list.forEach(r => grid.appendChild(createRestaurantCard(r)));
+    document.getElementById('restaurant-count').textContent = list.length;
+}
+
+function filterAndRender() {
+    const search = document.getElementById('search').value.toLowerCase();
+    const price = document.getElementById('price-filter').value;
+    let filtered = restaurantData.filter(r => {
+        const matchSearch = r.name.toLowerCase().includes(search) || r.cuisine.toLowerCase().includes(search);
+        const matchPrice = price === 'all' || r.price === price;
+        const matchAttr = activeAttributeFilters.size===0 || Array.from(activeAttributeFilters).every(f=>{
+            if(f==='michelin') return r.michelin; if(f==='holeInTheWall') return r.holeInTheWall; if(f==='takeout') return r.takeout;});
+        return matchSearch && matchPrice && matchAttr;
+    });
+    filtered.sort((a,b)=>a.rank-b.rank);
+    renderRestaurants(filtered);
+    updateCharts(filtered);
+}
+
+function updateCharts(data){
+    updatePriceChart(data);
+    updateCuisineChart(data);
+}
+
+function updatePriceChart(data){
+    const counts={};
+    data.forEach(r=>{counts[r.price]=(counts[r.price]||0)+1;});
+    const labels=Object.keys(counts).sort((a,b)=>({"$":1,"$$":2,"$$$":3,"$$$$":4})[a]-({"$":1,"$$":2,"$$$":3,"$$$$":4})[b]);
+    const chartData=labels.map(l=>counts[l]);
+    const colors={"$":"#28a745","$$":"#ffc107","$$$":"#fd7e14","$$$$":"#dc3545"};
+    const bg=labels.map(l=>colors[l]);
+    if(priceChart){priceChart.data.labels=labels;priceChart.data.datasets[0].data=chartData;priceChart.data.datasets[0].backgroundColor=bg;priceChart.update();}
+    else{const ctx=document.getElementById('priceChart').getContext('2d');priceChart=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:chartData,backgroundColor:bg,borderColor:'#FDFBF8',borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});}
+}
+
+function updateCuisineChart(data){
+    const counts={};
+    data.forEach(r=>{let c=r.cuisine.split('(')[0].split(',')[0].trim();if(c.includes('American'))c='American';if(c.includes('Italian'))c='Italian';if(c.includes('Japanese'))c='Japanese';if(c.includes('Seafood'))c='Seafood';counts[c]=(counts[c]||0)+1;});
+    const sorted=Object.entries(counts).sort(([,a],[,b])=>b-a).slice(0,7);
+    const labels=sorted.map(s=>s[0]);
+    const chartData=sorted.map(s=>s[1]);
+    const colors=['#6B7280','#8D6C9F','#A7D9A2','#E87C7C','#5DADE2','#F4B942','#C3AED6'];
+    const bg=labels.map((_,i)=>colors[i%colors.length]);
+    if(cuisineChart){cuisineChart.data.labels=labels;cuisineChart.data.datasets[0].data=chartData;cuisineChart.data.datasets[0].backgroundColor=bg;cuisineChart.update();}
+    else{const ctx=document.getElementById('cuisineChart').getContext('2d');cuisineChart=new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:'Number of Restaurants',data:chartData,backgroundColor:bg,borderColor:'#4B5563',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}}});}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    const searchInput=document.getElementById('search');
+    const priceFilter=document.getElementById('price-filter');
+    document.querySelectorAll('.filter-button').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            const f=btn.dataset.filter;btn.classList.toggle('active');
+            if(activeAttributeFilters.has(f)) activeAttributeFilters.delete(f); else activeAttributeFilters.add(f);
+            filterAndRender();
         });
-
-        function renderList() {
-            tableBody.innerHTML = '';
-            eateries.forEach(e => {
-                if (cuisineSelect.value !== 'all' && e.cuisine !== cuisineSelect.value) return;
-                if (priceSelect.value !== 'all' && e.price !== priceSelect.value) return;
-                if (starFilter.checked && !e.star) return;
-                if (holeFilter.checked && !e.hole) return;
-                if (takeoutFilter.checked && !e.takeout) return;
-                const row = document.createElement('tr');
-                const nameCell = document.createElement('td');
-                nameCell.textContent = e.name;
-                const cuisineCell = document.createElement('td');
-                cuisineCell.textContent = e.cuisine;
-                const priceCell = document.createElement('td');
-                priceCell.textContent = e.price;
-                row.appendChild(nameCell);
-                row.appendChild(cuisineCell);
-                row.appendChild(priceCell);
-                tableBody.appendChild(row);
-            });
-        }
-
-        cuisineSelect.addEventListener('change', renderList);
-        priceSelect.addEventListener('change', renderList);
-        starFilter.addEventListener('change', renderList);
-        holeFilter.addEventListener('change', renderList);
-        takeoutFilter.addEventListener('change', renderList);
-
-        applyStoredTheme();
-        updateToggleText();
-        renderList();
-    </script>
+    });
+    searchInput.addEventListener('input',filterAndRender);
+    priceFilter.addEventListener('change',filterAndRender);
+    document.querySelectorAll('.close-button').forEach(b=>b.addEventListener('click',()=>{document.getElementById('restaurant-modal').style.display='none';document.getElementById('full-report-modal').style.display='none';}));
+    window.addEventListener('click',e=>{if(e.target==document.getElementById('restaurant-modal'))document.getElementById('restaurant-modal').style.display='none';if(e.target==document.getElementById('full-report-modal'))document.getElementById('full-report-modal').style.display='none';});
+    document.getElementById('open-full-report-btn').addEventListener('click',()=>{const md='# Full Culinary Report\n\nDetailed information coming soon.';document.getElementById('full-report-content').innerHTML=marked.parse(md);document.getElementById('full-report-modal').style.display='flex';});
+    setTimeout(()=>{document.getElementById('loader-container').classList.add('hidden');document.getElementById('restaurant-grid').classList.remove('hidden');filterAndRender();},500);
+});
+</script>
 </body>
 </html>
