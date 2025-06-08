@@ -27,12 +27,12 @@
             height: 100vh;
         }
         h1 {
-            margin-bottom: 0.5rem;
+            margin-bottom: 2rem;
         }
         #countdown {
             font-size: 2rem;
             font-weight: bold;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
         }
         #weekend-count {
             font-size: 1.5rem;
@@ -47,13 +47,32 @@
             color: var(--bg-color);
             border-radius: 4px;
         }
+        #skyline {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 2rem;
+        }
+        nav {
+            margin-bottom: 2rem;
+        }
+        nav a {
+            margin: 0 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Countdown to Chicago Move</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="guide.html">2025 Guide</a>
+        <a href="eateries.html">Top Eateries</a>
+    </nav>
+    <h1>We're moving to Chicago in:</h1>
+    <img id="skyline" src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=60" alt="Chicago skyline">
     <div id="countdown">Loading...</div>
     <div id="weekend-count"></div>
-    <button id="theme-toggle">Toggle Theme</button>
+    <button id="theme-toggle">Dark Mode</button>
 
     <script>
         const targetDate = new Date('2025-08-01T00:00:00');
@@ -101,9 +120,20 @@
             return weekends;
         }
 
+        function updateToggleText() {
+            if (document.body.classList.contains('dark')) {
+                themeToggle.textContent = 'Light Mode';
+            } else {
+                themeToggle.textContent = 'Dark Mode';
+            }
+        }
+
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
+            updateToggleText();
         });
+
+        updateToggleText();
 
         updateCountdown();
         setInterval(updateCountdown, 1000);

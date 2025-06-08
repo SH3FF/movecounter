@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 Chicago Guide</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #007bff;
+        }
+        .dark {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #66b0ff;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 1rem;
+        }
+        nav {
+            margin-bottom: 1rem;
+        }
+        nav a {
+            margin: 0 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        #theme-toggle {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            border: none;
+            color: var(--bg-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="guide.html">2025 Guide</a>
+        <a href="eateries.html">Top Eateries</a>
+    </nav>
+    <h1>2025 Guide to Chicago</h1>
+    <p>Welcome to the Windy City! This brief guide will help you get settled in 2025 with tips on neighborhoods, transit, and things to see.</p>
+    <button id="theme-toggle">Dark Mode</button>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        function updateToggleText() {
+            if (document.body.classList.contains('dark')) {
+                themeToggle.textContent = 'Light Mode';
+            } else {
+                themeToggle.textContent = 'Dark Mode';
+            }
+        }
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            updateToggleText();
+        });
+        updateToggleText();
+    </script>
+</body>
+</html>
