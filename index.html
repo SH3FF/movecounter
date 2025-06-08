@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Move Countdown</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #007bff;
+        }
+        .dark {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #66b0ff;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            margin-bottom: 0.5rem;
+        }
+        #countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        #weekend-count {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        #theme-toggle {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            border: none;
+            color: var(--bg-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Countdown to Chicago Move</h1>
+    <div id="countdown">Loading...</div>
+    <div id="weekend-count"></div>
+    <button id="theme-toggle">Toggle Theme</button>
+
+    <script>
+        const targetDate = new Date('2025-08-01T00:00:00');
+        const countdownEl = document.getElementById('countdown');
+        const weekendEl = document.getElementById('weekend-count');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        function updateCountdown() {
+            const now = new Date();
+            let diff = targetDate - now;
+            if (diff < 0) diff = 0;
+
+            let seconds = Math.floor(diff / 1000);
+            const weeks = Math.floor(seconds / (7 * 24 * 60 * 60));
+            seconds %= 7 * 24 * 60 * 60;
+            const days = Math.floor(seconds / (24 * 60 * 60));
+            seconds %= 24 * 60 * 60;
+            const hours = Math.floor(seconds / 3600);
+            seconds %= 3600;
+            const minutes = Math.floor(seconds / 60);
+            seconds %= 60;
+
+            countdownEl.textContent =
+                `${weeks} weeks, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+
+            weekendEl.textContent = `${countWeekends(now, targetDate)} weekends remaining`;
+        }
+
+        function countWeekends(start, end) {
+            let weekends = 0;
+            let current = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+            current.setHours(0,0,0,0);
+            const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+            endDate.setHours(0,0,0,0);
+
+            // Move to next Saturday
+            const day = current.getDay();
+            const daysToSaturday = (6 - day + 7) % 7;
+            current.setDate(current.getDate() + daysToSaturday);
+
+            while (current < endDate) {
+                weekends++;
+                current.setDate(current.getDate() + 7);
+            }
+            return weekends;
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+        });
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
