@@ -135,8 +135,17 @@
             }
         }
 
+        function applyStoredTheme() {
+            const stored = localStorage.getItem('theme');
+            if (stored === 'dark') {
+                document.body.classList.add('dark');
+            }
+        }
+
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
+            const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
             updateToggleText();
         });
 
@@ -168,6 +177,7 @@
         holeFilter.addEventListener('change', renderList);
         takeoutFilter.addEventListener('change', renderList);
 
+        applyStoredTheme();
         updateToggleText();
         renderList();
     </script>

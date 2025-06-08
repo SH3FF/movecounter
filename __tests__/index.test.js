@@ -6,7 +6,7 @@ describe('index.html', () => {
   let dom, document, window;
   beforeAll(async () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-    dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable' });
+    dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable', url: 'http://localhost' });
     await new Promise(r => {
       dom.window.addEventListener('load', r);
     });
@@ -32,6 +32,20 @@ describe('index.html', () => {
     expect(document.body.classList.contains('dark')).toBe(true);
     btn.click();
     expect(document.body.classList.contains('dark')).toBe(false);
+  });
+
+  test('applies stored theme on load', async () => {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+    const dom2 = new JSDOM(html, {
+      runScripts: 'dangerously',
+      resources: 'usable',
+      url: 'http://localhost',
+      beforeParse(window) {
+        window.localStorage.setItem('theme', 'dark');
+      }
+    });
+    await new Promise(r => dom2.window.addEventListener('load', r));
+    expect(dom2.window.document.body.classList.contains('dark')).toBe(true);
   });
 
   test('countWeekends calculates correctly', () => {
